@@ -1,3 +1,9 @@
+# Misc
+*.txt
+*.pdf
+*.dot
+main
+
 # Prerequisites
 *.d
 
