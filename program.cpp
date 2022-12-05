@@ -1,7 +1,7 @@
 #include "program.hh"
 
 
-bool isNewLine(char c)
+bool Program::isNewLine(char c)
 {
     return c == '\r' || // also a new line symbol
            c == '\n';
@@ -10,33 +10,53 @@ bool isNewLine(char c)
 void Program::takeInput(std::ifstream& in)
 {
     bool isKey = true;
-    bool isDistance = false;
-    while (in && !in.eof())
+    std::string loaded_key;
+    std::string s;
+
+    while(getline(in, s)) // get every row of file
     {
-        std::string s;
-        in >> s;
-        if (isKey) //key value for the map
+        bool isKey = true;
+        std::stringstream ss(s); //convert to stringstream so getline is usable
+        while (getline(ss, s, ' '))
         {
-            Junction j(s);
-            std::cout << "Key name: " << j.getName() << std::endl;
-            isKey = false;
-            continue;
-        }
-        if (isDistance) // distance value {check stoi}
-        {
-            std::cout << "distance: " << s << std::endl;
-            isDistance = false;
-        }
-        else // junction 
-        {
-            Junction j(s);
-            std::cout << "J name: " << j.getName() << std::endl;
-            isDistance = true;
-        }
-        if(isNewLine(in.peek()))
-        {
-            isKey = true;
+            if (isKey) //key value for the map
+            {
+                if (loaded_city.city_map.find(s) != loaded_city.city_map.end()) // key is found
+                {
+                    loaded_key = s;
+                }
+                else //key not found
+                {
+                    loaded_city.addKey(s);
+                    loaded_key = s;
+                }
+                isKey = false;
+            }
+            else
+            {
+                if(!isNewLine(ss.peek()))
+                {
+                    std::string s1;
+                    getline(ss, s1, ' ');
+                    if (stoi(s1)) {
+                        int distance = stoi(s1);
+                        loaded_city.addRoad(loaded_key, s, distance);
+                    }
+                }
+            }
         }
     }
+}
 
+void Program::printMap()
+{
+    for (auto it : loaded_city.city_map)
+    {
+        std::cout << "Key: " << it.first << " | ";
+        for (auto v : it.second)
+        {
+            std::cout << v.first << " " << v.second << ", ";
+        }
+        std::cout << std::endl;
+    }
 }
