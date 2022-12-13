@@ -10,17 +10,19 @@
 #include "road.hh"
 #include "junction.hh"
 
-typedef std::pair<std::string, int> Pair;
+typedef std::pair<Junction, int> Pair;
 
 class City
 {
     private:
      //for every junction we have a vector of pairs of another junction and distance to it
+    std::map<Junction, std::vector<Pair>> city_map;
 
     public:
     City();
-    std::map<std::string, std::vector<Pair>> city_map;
-    void addToMap(Road&);
+
+    std::map<Junction, std::vector<Pair>>& getMap();
+
     void addKey(std::string&);
     void addRoad(std::string&, std::string&, int);
 };

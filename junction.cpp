@@ -7,3 +7,13 @@ std::string Junction::getName() const
 {
     return name;
 }
+
+bool Junction::operator<(const Junction& other) const
+{
+    return this->name < other.name;
+}
+
+bool Junction::operator==(const Junction& other) const
+{
+    return this->name == other.name;
+}

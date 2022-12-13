@@ -12,6 +12,9 @@ class Junction
     Junction(const std::string&);
     std::string getName() const;
     bool isOpen;
+
+    bool operator<(const Junction&) const;
+    bool operator==(const Junction&) const;
 };
 
 #endif

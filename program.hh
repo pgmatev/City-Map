@@ -15,9 +15,13 @@ class Program
     bool isNumber(char);
     bool isNewLine(char);
 
+    void toDottyHelper(std::ostream&);
+
     public:
     void takeInput(std::ifstream&);
     void printMap();
+    
+    void toDotty(std::ostream&);
 };
 
 #endif
