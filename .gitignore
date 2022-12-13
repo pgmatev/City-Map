@@ -3,6 +3,7 @@
 *.pdf
 *.dot
 main
+.vscode
 
 # Prerequisites
 *.d
