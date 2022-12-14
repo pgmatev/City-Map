@@ -15,7 +15,7 @@ void Program::takeInput(std::ifstream& in)
 
     while(getline(in, s)) // get every row of file
     {
-        bool isKey = true;
+        bool isKey = true; // first value of a row is a key junction
         std::stringstream ss(s); //convert to stringstream so getline is usable
         while (getline(ss, s, ' '))
         {
@@ -32,13 +32,13 @@ void Program::takeInput(std::ifstream& in)
                 }
                 isKey = false;
             }
-            else
+            else //not a key, not first value
             {
-                if(!isNewLine(ss.peek()))
-                {
-                    std::string s1;
+                if(!isNewLine(ss.peek())) //if the symbol after the value is a new line                           
+                {                        //there is no next value
+                    std::string s1;     //pairing the values so to get the junction and its distance
                     getline(ss, s1, ' ');
-                    if (stoi(s1)) {
+                    if (stoi(s1)) { //distance should be a number
                         int distance = stoi(s1);
                         loaded_city.addRoad(loaded_key, s, distance);
                     }
@@ -61,7 +61,7 @@ void Program::printMap()
     }
 }
 
-void Program::toDotty(std::ostream& out)
+void Program::toDotty(std::ostream& out) // writes to a file in the .dot language syntax
 {
     out << "Digraph G {\n";
     toDottyHelper(out);

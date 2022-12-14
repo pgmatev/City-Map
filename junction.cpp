@@ -8,7 +8,7 @@ std::string Junction::getName() const
     return name;
 }
 
-bool Junction::operator<(const Junction& other) const
+bool Junction::operator<(const Junction& other) const //std::map requires key types to have < operator 
 {
     return this->name < other.name;
 }
