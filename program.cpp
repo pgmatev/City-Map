@@ -86,3 +86,8 @@ void Program::toDottyHelper(std::ostream& out)
         }
     }
 }
+
+bool Program::hasPath(const std::string& source, const std::string& destination)
+{
+    return loaded_city.hasPath(source, destination);
+}

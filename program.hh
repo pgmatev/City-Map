@@ -22,6 +22,8 @@ class Program
     void printMap();
     
     void toDotty(std::ostream&);
+
+    bool hasPath(const std::string&, const std::string&);
 };
 
 #endif

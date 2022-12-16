@@ -3,7 +3,9 @@
 
 #include <map>
 #include <vector>
+#include <queue>
 #include <utility> //for pair
+#include <algorithm> //for std::find
 #include <stdexcept>
 
 
@@ -22,7 +24,7 @@ class City
     City();
 
     std::map<std::string, std::vector<Pair>>& getMap();
-    std::vector<std::string>>& getClosedJunctions();
+    std::vector<std::string>& getClosedJunctions();
 
     void addKey(const std::string&);
     void addRoad(const std::string&, const std::string&, int);
