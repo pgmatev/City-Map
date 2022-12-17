@@ -91,3 +91,8 @@ bool Program::hasPath(const std::string& source, const std::string& destination)
 {
     return loaded_city.hasPath(source, destination);
 }
+
+void Program::shortestPathsFromSource(const std::string& source)
+{
+    loaded_city.shortestPathsFromSource(source);
+}

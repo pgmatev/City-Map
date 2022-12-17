@@ -7,10 +7,14 @@
 #include <utility> //for pair
 #include <algorithm> //for std::find
 #include <stdexcept>
-
+#include <limits> //limits so to define infinity
 
 #include "road.hh"
 #include "junction.hh"
+
+#include <iostream>
+
+#define INF std::numeric_limits<int>::max() //technical upper boundary for integers, can be treated as infinity 
 
 typedef std::pair<std::string, int> Pair;
 
@@ -29,6 +33,7 @@ class City
     void addKey(const std::string&);
     void addRoad(const std::string&, const std::string&, int);
     bool hasPath(const std::string&, const std::string&);
+    void shortestPathsFromSource(const std::string&);
 };
 
 #endif

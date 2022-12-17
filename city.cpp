@@ -91,3 +91,49 @@ bool City::hasPath(const std::string& source, const std::string& destination)
 
     return false;
 }
+
+void City::shortestPathsFromSource(const std::string& source) //Dijkstra's algorithm
+{
+    std::priority_queue<std::pair<int, std::string>, std::vector<std::pair<int, std::string>>, std::greater<std::pair<int, std::string>>> pq;
+    //priority queue can be used to implement heap, in this case min heap because of the functor argument greater
+    std::map<std::string, int> dist; //distances to all other junctions from the source
+
+    for (auto it : city_map)
+    {
+        if (it.first == source)
+        {
+            dist.insert({source, 0}); //distance from A to A is 0
+        }
+        else
+        {
+            dist.insert({it.first, INF}); //at the beginning every distance is INF 
+        }
+    }
+    std::string s = source;
+    pq.push({0, s}); //pq is sorted by the first element of the pair, so it should be the distance
+                         // if the name is first we will be sorting it by name which is wrong
+
+    while(!pq.empty())//BFS logic
+    {
+        std::string curr = pq.top().second;
+        pq.pop();
+
+        for (auto i : city_map.find(curr)->second) //get the adjacent junctions of the current junction
+        {
+            std::string j = i.first; //get the name of the adj junction
+            int d = i.second; // get the distance to the adj junction
+
+            if (dist.find(j)->second > dist.find(curr)->second + d)
+            //if the saved distance to j is bigger than the newly found path to it through curr
+            {
+                dist.find(j)->second = dist.find(curr)->second + d;
+                pq.push({dist.find(j)->second, j});
+            }
+        }
+    }
+
+    for (auto i : dist)
+    {
+        std::cout << "Distance to: " << i.first << " = " << i.second << std::endl;
+    }
+}
