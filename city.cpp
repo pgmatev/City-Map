@@ -92,11 +92,12 @@ bool City::hasPath(const std::string& source, const std::string& destination)
     return false;
 }
 
-void City::shortestPathsFromSource(const std::string& source) //Dijkstra's algorithm
+std::vector<std::string> City::shortestPathsFromSource(const std::string& source, const std::string& destination) //Dijkstra's algorithm
 {
     std::priority_queue<std::pair<int, std::string>, std::vector<std::pair<int, std::string>>, std::greater<std::pair<int, std::string>>> pq;
     //priority queue can be used to implement heap, in this case min heap because of the functor argument greater
     std::map<std::string, int> dist; //distances to all other junctions from the source
+    std::map<std::string, std::vector<std::string>> paths; //paths to all other junctions from the source
 
     for (auto it : city_map)
     {
@@ -108,6 +109,7 @@ void City::shortestPathsFromSource(const std::string& source) //Dijkstra's algor
         {
             dist.insert({it.first, INF}); //at the beginning every distance is INF 
         }
+        paths.insert({it.first, std::vector<std::string>()});
     }
     std::string s = source;
     pq.push({0, s}); //pq is sorted by the first element of the pair, so it should be the distance
@@ -127,13 +129,64 @@ void City::shortestPathsFromSource(const std::string& source) //Dijkstra's algor
             //if the saved distance to j is bigger than the newly found path to it through curr
             {
                 dist.find(j)->second = dist.find(curr)->second + d;
+                paths.find(j)->second = paths.find(curr)->second;
+                paths.find(j)->second.push_back(curr);
                 pq.push({dist.find(j)->second, j});
             }
         }
     }
 
-    for (auto i : dist)
+    std::vector<std::string> result = paths.find(destination)->second;
+    result.push_back(destination);
+    return result;
+}
+
+//FUTURE TO DO: Make loopless (Yen's algorithm), Optimise by removing junctions with no path to destination
+std::map<int, std::vector<std::string>> City::kShortestPaths(const std::string& source, const std::string& destination, int k) //Eppstein's algorithm, based on Dijkstra's algorithm
+{
+    std::priority_queue<std::tuple<int, std::string, std::vector<std::string>>,
+                        std::vector<std::tuple<int, std::string, std::vector<std::string>>>,
+                        std::greater<std::tuple<int, std::string, std::vector<std::string>>>> pq;   
+    //implementation of min heap, sorting the paths helps us to pop the shortest current path first, 
+    //therefore the first 3 pops will be the 3 shortests paths
+    std::map<std::string, int> visited_count; //count the amount of times we visited a junction
+    std::map<int, std::vector<std::string>> results;
+
+    for (auto it : city_map)
     {
-        std::cout << "Distance to: " << i.first << " = " << i.second << std::endl;
+        visited_count.insert({it.first, 0}); //filling the visited map
     }
+
+    pq.push({0, source, std::vector<std::string>{source}});
+    //starting point, distance to it is 0 and the path to it is itself
+
+    while (!pq.empty())
+    {
+        std::tuple<int, std::string, std::vector<std::string>> tp = pq.top();
+        int distance = std::get<0>(tp);
+        std::string junction = std::get<1>(tp);
+        std::vector<std::string> path = std::get<2>(tp);
+        pq.pop();
+
+        if(visited_count.find(junction)->second == k) //only count the first k visits, in order to get the k shortest paths
+        {
+            continue;
+        }
+
+        visited_count.find(junction)->second += 1;
+
+        if (junction == destination) //reached destination, insert accumulated path
+        {
+            results.insert({distance, path});
+        }
+
+        for (auto adjacent : city_map.find(junction)->second) //queue all adjacent junctions to current be traversed
+        {
+            std::vector<std::string> new_path = path;
+            new_path.push_back(adjacent.first);
+            pq.push({distance + adjacent.second, adjacent.first, new_path});
+        }
+    }
+    
+    return results;
 }

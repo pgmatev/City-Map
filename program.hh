@@ -23,8 +23,8 @@ class Program
     
     void toDotty(std::ostream&);
 
-    bool hasPath(const std::string&, const std::string&);
-    void shortestPathsFromSource(const std::string&);
+    void hasPath(const std::string&, const std::string&);
+    void threeShortestPaths(const std::string&, const std::string&);
 };
 
 #endif

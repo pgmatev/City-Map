@@ -87,12 +87,40 @@ void Program::toDottyHelper(std::ostream& out)
     }
 }
 
-bool Program::hasPath(const std::string& source, const std::string& destination)
+void Program::hasPath(const std::string& source, const std::string& destination)
 {
-    return loaded_city.hasPath(source, destination);
+    if (loaded_city.hasPath(source, destination))
+    {
+        std::cout << "There is a path between " << source << " and " << destination << std::endl;
+    }
+    else
+    {
+        std::cout << "There is no path between " << source << " and " << destination << std::endl;
+    }
 }
 
-void Program::shortestPathsFromSource(const std::string& source)
+//to do: make sure source and destination are valid junctions
+void Program::threeShortestPaths(const std::string& source, const std::string& destination)
 {
-    loaded_city.shortestPathsFromSource(source);
+    std::map<int, std::vector<std::string>>  results = loaded_city.kShortestPaths(source, destination, 3); //it can work with k amount of paths
+    try
+    {
+        if (results.size() < 3)
+        {
+            throw results.size();
+        }
+    }catch(unsigned long e)
+    {
+        std::cout << "There are only " << e << " paths between " << source << " and " << destination << std::endl;
+    }
+
+    std::cout << "The shortest paths from " << source << " to " << destination << ": " << std::endl;
+    for (auto i : results)
+    {
+        for (auto j : i.second)
+        {
+            std::cout << j << " ";
+        }
+        std::cout << "= " << i.first << std::endl;
+    }
 }

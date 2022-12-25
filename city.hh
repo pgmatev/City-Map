@@ -4,6 +4,7 @@
 #include <map>
 #include <vector>
 #include <queue>
+#include <tuple>
 #include <utility> //for pair
 #include <algorithm> //for std::find
 #include <stdexcept>
@@ -12,7 +13,6 @@
 #include "road.hh"
 #include "junction.hh"
 
-#include <iostream>
 
 #define INF std::numeric_limits<int>::max() //technical upper boundary for integers, can be treated as infinity 
 
@@ -33,7 +33,8 @@ class City
     void addKey(const std::string&);
     void addRoad(const std::string&, const std::string&, int);
     bool hasPath(const std::string&, const std::string&);
-    void shortestPathsFromSource(const std::string&);
+    std::vector<std::string> shortestPathsFromSource(const std::string&, const std::string&);
+    std::map<int, std::vector<std::string>>  kShortestPaths(const std::string&, const std::string&, int k);
 };
 
 #endif
