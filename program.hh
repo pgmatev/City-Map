@@ -6,6 +6,7 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <iterator>
 
 class Program
 {
@@ -19,12 +20,15 @@ class Program
 
     public:
     void takeInput(std::ifstream&);
+    void passClosedJunctions(const std::string&);
     void printMap();
     
     void toDotty(std::ostream&);
 
     void hasPath(const std::string&, const std::string&);
+    void hasCycle(const std::string&);
     void threeShortestPaths(const std::string&, const std::string&);
+
 };
 
 #endif

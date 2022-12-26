@@ -13,6 +13,18 @@ std::vector<std::string>& City::getClosedJunctions()
     return this->closed_junctions;
 }
 
+void City::setClosedJunctions(const std::vector<std::string>& v)
+{
+    for (auto i : v)
+    {
+        if (city_map.find(i) == city_map.end())
+        {
+            throw std::invalid_argument("Junction does not exist!");
+        }
+    }
+    this->closed_junctions = v;
+}
+
 void City::addKey(const std::string& s)
 {
     if (city_map.find(s) == city_map.end()) //insert if this junction doesn't exist in the map
@@ -81,7 +93,42 @@ bool City::hasPath(const std::string& source, const std::string& destination)
                 return true;
             }
 
-            if(std::find(visited.begin(), visited.end(), i.first) == visited.end())
+            if(std::find(visited.begin(), visited.end(), i.first) == visited.end()) // if we haven't visited this junction yet
+            {
+                visited.push_back(i.first);
+                queue.push(i.first);
+            }
+        }
+    }
+
+    return false;
+}
+
+bool City::hasCycle(const std::string& source)
+{
+    if (city_map.find(source) == city_map.end())
+    {
+        throw std::invalid_argument("Source does not exist!");
+    }
+    //using BFS method
+    std::queue<std::string> queue;
+    std::vector<std::string> visited;
+
+    queue.push(source);
+    visited.push_back(source);
+
+    while (!queue.empty())
+    {
+        std::string s = queue.front();
+        queue.pop();
+        for (auto i : city_map.find(s)->second)
+        {
+            if (i.first == source)
+            {
+                return true;
+            }
+
+            if(std::find(visited.begin(), visited.end(), i.first) == visited.end()) // if we haven't visited this junction yet
             {
                 visited.push_back(i.first);
                 queue.push(i.first);
@@ -94,6 +141,15 @@ bool City::hasPath(const std::string& source, const std::string& destination)
 
 std::vector<std::string> City::shortestPathsFromSource(const std::string& source, const std::string& destination) //Dijkstra's algorithm
 {
+    if (city_map.find(source) == city_map.end())
+    {
+        throw std::invalid_argument("Source does not exist!");
+    }
+
+    if (city_map.find(destination) == city_map.end())
+    {
+        throw std::invalid_argument("Destination does not exist!");
+    }
     std::priority_queue<std::pair<int, std::string>, std::vector<std::pair<int, std::string>>, std::greater<std::pair<int, std::string>>> pq;
     //priority queue can be used to implement heap, in this case min heap because of the functor argument greater
     std::map<std::string, int> dist; //distances to all other junctions from the source
@@ -124,14 +180,16 @@ std::vector<std::string> City::shortestPathsFromSource(const std::string& source
         {
             std::string j = i.first; //get the name of the adj junction
             int d = i.second; // get the distance to the adj junction
-
-            if (dist.find(j)->second > dist.find(curr)->second + d)
-            //if the saved distance to j is bigger than the newly found path to it through curr
+            if (std::find(closed_junctions.begin(), closed_junctions.end(), j) == closed_junctions.end()) //if junction is not closed
             {
-                dist.find(j)->second = dist.find(curr)->second + d;
-                paths.find(j)->second = paths.find(curr)->second;
-                paths.find(j)->second.push_back(curr);
-                pq.push({dist.find(j)->second, j});
+                if (dist.find(j)->second > dist.find(curr)->second + d)
+                //if the saved distance to j is bigger than the newly found path to it through curr
+                {
+                    dist.find(j)->second = dist.find(curr)->second + d;
+                    paths.find(j)->second = paths.find(curr)->second;
+                    paths.find(j)->second.push_back(curr);
+                    pq.push({dist.find(j)->second, j});
+                }
             }
         }
     }
@@ -142,8 +200,18 @@ std::vector<std::string> City::shortestPathsFromSource(const std::string& source
 }
 
 //FUTURE TO DO: Make loopless (Yen's algorithm), Optimise by removing junctions with no path to destination
-std::map<int, std::vector<std::string>> City::kShortestPaths(const std::string& source, const std::string& destination, int k) //Eppstein's algorithm, based on Dijkstra's algorithm
+std::map<int, std::vector<std::string>> City::kShortestPaths(const std::string& source, const std::string& destination, int k)
+//Eppstein's algorithm, based on Dijkstra's algorithm
 {
+    if (city_map.find(source) == city_map.end())
+    {
+        throw std::invalid_argument("Source does not exist!");
+    }
+
+    if (city_map.find(destination) == city_map.end())
+    {
+        throw std::invalid_argument("Destination does not exist!");
+    }
     std::priority_queue<std::tuple<int, std::string, std::vector<std::string>>,
                         std::vector<std::tuple<int, std::string, std::vector<std::string>>>,
                         std::greater<std::tuple<int, std::string, std::vector<std::string>>>> pq;   
@@ -182,11 +250,15 @@ std::map<int, std::vector<std::string>> City::kShortestPaths(const std::string& 
 
         for (auto adjacent : city_map.find(junction)->second) //queue all adjacent junctions to current be traversed
         {
-            std::vector<std::string> new_path = path;
-            new_path.push_back(adjacent.first);
-            pq.push({distance + adjacent.second, adjacent.first, new_path});
+            if (std::find(closed_junctions.begin(), closed_junctions.end(), adjacent.first) == closed_junctions.end()) //if junction is not closed
+            {
+                std::vector<std::string> new_path = path;
+                new_path.push_back(adjacent.first);
+                pq.push({distance + adjacent.second, adjacent.first, new_path});
+            }
+
         }
     }
-    
+
     return results;
 }

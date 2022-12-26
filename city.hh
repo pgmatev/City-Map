@@ -29,10 +29,12 @@ class City
 
     std::map<std::string, std::vector<Pair>>& getMap();
     std::vector<std::string>& getClosedJunctions();
+    void setClosedJunctions(const std::vector<std::string>&);
 
     void addKey(const std::string&);
     void addRoad(const std::string&, const std::string&, int);
     bool hasPath(const std::string&, const std::string&);
+    bool hasCycle(const std::string&);
     std::vector<std::string> shortestPathsFromSource(const std::string&, const std::string&);
     std::map<int, std::vector<std::string>>  kShortestPaths(const std::string&, const std::string&, int k);
 };

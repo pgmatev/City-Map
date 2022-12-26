@@ -53,6 +53,15 @@ void Program::takeInput(std::ifstream& in)
     }
 }
 
+void Program::passClosedJunctions(const std::string& s)
+{
+    std::stringstream ss(s);
+    std::istream_iterator<std::string> begin(ss);
+    std::istream_iterator<std::string> end;
+    std::vector<std::string> v(begin, end);
+    loaded_city.setClosedJunctions(v);
+}
+
 void Program::printMap()
 {
     for (auto it : loaded_city.getMap())
@@ -99,6 +108,18 @@ void Program::hasPath(const std::string& source, const std::string& destination)
     }
 }
 
+void Program::hasCycle(const std::string& source)
+{
+    if(loaded_city.hasCycle(source))
+    {
+        std::cout << "It is possible to return to " << source << std::endl;
+    }
+    else
+    {
+        std::cout << "It is not possible to return to " << source << std::endl;
+    }
+}
+
 //to do: make sure source and destination are valid junctions
 void Program::threeShortestPaths(const std::string& source, const std::string& destination)
 {
@@ -111,7 +132,16 @@ void Program::threeShortestPaths(const std::string& source, const std::string& d
         }
     }catch(unsigned long e)
     {
-        std::cout << "There are only " << e << " paths between " << source << " and " << destination << std::endl;
+        if(e == 0)
+        {
+            std::cout << "There are no paths between " << source << " and " << destination << std::endl;
+            return;
+        }
+        else
+        {
+            std::cout << "There are only " << e << " path/s between " << source << " and " << destination << std::endl;
+        }
+
     }
 
     std::cout << "The shortest paths from " << source << " to " << destination << ": " << std::endl;
