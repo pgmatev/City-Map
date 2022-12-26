@@ -87,7 +87,16 @@ void Program::toDottyHelper(std::ostream& out)
     for (auto it : loaded_city.getMap())
     {
         auto j1 = loaded_city.getMap().find(it.first);
-        out << (long)&j1->first << "[label=\"" << j1->first << "\"];\n";
+        if (std::find(loaded_city.getClosedJunctions().begin(), 
+                      loaded_city.getClosedJunctions().end(),
+                      j1->first) == loaded_city.getClosedJunctions().end()) //if the junction is not closed
+        {
+            out << (long)&j1->first << "[label=\"" << j1->first << "\"];\n";
+        }
+        else // if the junction is closed
+        {
+            out << (long)&j1->first << "[label=\"" << j1->first << "\" color = \"red\"];\n";
+        }
         for (auto v : j1->second)
         {
             auto j2 = loaded_city.getMap().find(v.first);
