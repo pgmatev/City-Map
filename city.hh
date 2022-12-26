@@ -10,9 +10,6 @@
 #include <stdexcept>
 #include <limits> //limits so to define infinity
 
-#include "road.hh"
-#include "junction.hh"
-
 
 #define INF std::numeric_limits<int>::max() //technical upper boundary for integers, can be treated as infinity 
 

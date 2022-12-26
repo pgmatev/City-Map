@@ -1,4 +1,4 @@
-OBJ = main.o city.o program.o junction.o road.o
+OBJ = main.o city.o program.o
 CC = g++
 CFLAGS = -g -Wall -pedantic
 
@@ -11,7 +11,3 @@ program.o: program.cpp program.hh
 	$(CC) -c ./program.cpp
 city.o: city.cpp city.hh
 	$(CC) -c ./city.cpp
-junction.o: junction.cpp junction.hh
-	$(CC) -c ./junction.cpp
-road.o: road.cpp road.hh
-	$(CC) -c ./road.cpp
