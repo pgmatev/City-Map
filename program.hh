@@ -27,6 +27,8 @@ class Program
 
     void hasPath(const std::string&, const std::string&);
     void hasCycle(const std::string&);
+    void areReachable(const std::string&);
+    void deadEnds();
     void threeShortestPaths(const std::string&, const std::string&);
 
 };

@@ -42,6 +42,11 @@ void City::addRoad(const std::string& key, const std::string& junction, int dist
         throw std::invalid_argument("Cannot have a road leading to the same junction!");
     }
     
+    if (city_map.find(key) == city_map.end())
+    {
+        throw std::invalid_argument("Starting junction does not exist!");
+    }
+
     if (city_map.find(junction) == city_map.end()) //even if the second junction doesn't have roads exiting from it
     {                                           //make it a key
         addKey(junction);
@@ -137,6 +142,81 @@ bool City::hasCycle(const std::string& source)
     }
 
     return false;
+}
+
+bool City::areReachable(const std::string& source)
+{
+    if (city_map.find(source) == city_map.end())
+    {
+        throw std::invalid_argument("Source does not exist!");
+    }
+    //Another bfs
+    std::queue<std::string> queue;
+    std::vector<std::string> visited;
+
+    queue.push(source);
+    visited.push_back(source);
+
+    while (!queue.empty())
+    {
+        std::string s = queue.front();
+        queue.pop();
+        for (auto i : city_map.find(s)->second)
+        {
+            if(std::find(visited.begin(), visited.end(), i.first) == visited.end()) // if we haven't visited this junction yet
+            {
+                visited.push_back(i.first);
+                queue.push(i.first);
+            }
+        }
+    }
+    return visited.size() == city_map.size(); //if the number of visited junctions is equal to the total it means we can visit all of them
+}
+
+std::vector<std::pair<std::string, std::string>> City::deadEnds()
+{
+    std::string source;
+    std::queue<std::pair<std::string, std::string>> queue; // the queue keeps pairs of junctions that form a street
+    std::vector<std::pair<std::string, std::string>> visited; // also keeps pairs of junctions (aka streets)
+    std::vector<std::pair<std::string, std::string>> results;
+
+    for (auto it : city_map)
+    {
+        if (areReachable(it.first)) // guarantees full street coverage
+        {
+            source = it.first;
+            break;
+        }
+    }
+
+    for (auto it : city_map.find(source)->second) //preload the queue
+    {
+        queue.push({source, it.first});
+        visited.push_back({source, it.first});
+    }
+
+    while (!queue.empty())
+    {
+        std::pair<std::string, std::string> road = queue.front();
+        queue.pop();
+
+        if (city_map.find(road.second)->second.empty()) // if there are no streets exiting the junction it means it is a dead-end
+        {
+            results.push_back(road);
+            continue;
+        }
+
+        for (auto i : city_map.find(road.second)->second)
+        {
+            std::pair<std::string, std::string> next_road{road.second, i.first};
+            if(std::find(visited.begin(), visited.end(), next_road) == visited.end()) // if we haven't visited this road yet
+            {
+                visited.push_back(next_road);
+                queue.push(next_road);
+            }
+        }
+    }
+    return results;
 }
 
 std::vector<std::string> City::shortestPathsFromSource(const std::string& source, const std::string& destination) //Dijkstra's algorithm

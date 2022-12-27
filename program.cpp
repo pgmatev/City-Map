@@ -1,6 +1,5 @@
 #include "program.hh"
 
-
 bool Program::isNewLine(char c)
 {
     return c == '\r' || // also a new line symbol
@@ -77,7 +76,7 @@ void Program::printMap()
 
 void Program::toDotty(std::ostream& out) // writes to a file in the .dot language syntax
 {                                       // visualisation of the graph using graphviz
-    out << "Digraph G {\n";
+    out << "digraph G {\n";
     toDottyHelper(out);
     out << "}";
 }
@@ -127,6 +126,28 @@ void Program::hasCycle(const std::string& source)
     {
         std::cout << "It is not possible to return to " << source << std::endl;
     }
+}
+
+void Program::areReachable(const std::string& source)
+{
+    if (loaded_city.areReachable(source))
+    {
+        std::cout << "There are paths to all other junctions from " << source << std::endl; 
+    }
+    else
+    {
+        std::cout << "Cannot reach every other junction from " << source << std::endl; 
+    }
+}
+
+void Program::deadEnds()
+{
+    std::cout << "Dead-end streets: ";
+    for (auto it : loaded_city.deadEnds())
+    {
+        std::cout << "{" << it.first << ", " << it.second << "} ";
+    }
+    std::cout << std::endl;
 }
 
 //to do: make sure source and destination are valid junctions

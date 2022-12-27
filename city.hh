@@ -32,6 +32,8 @@ class City
     void addRoad(const std::string&, const std::string&, int);
     bool hasPath(const std::string&, const std::string&);
     bool hasCycle(const std::string&);
+    bool areReachable(const std::string&);
+    std::vector<std::pair<std::string,std::string>> deadEnds();
     std::vector<std::string> shortestPathsFromSource(const std::string&, const std::string&);
     std::map<int, std::vector<std::string>>  kShortestPaths(const std::string&, const std::string&, int k);
 };

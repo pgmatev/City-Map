@@ -82,9 +82,44 @@ TEST_CASE("Algorithms tests")
         c.addRoad("C", "D", 4);
         c.addRoad("C", "E", 5);
         c.addRoad("E", "D", 1);
-        std::map<int, std::vector<std::string>> result = {{3, std::vector<std::string>{"A", "C", "B"}},
+        std::map<int, std::vector<std::string>> results = {{3, std::vector<std::string>{"A", "C", "B"}},
                                                           {4, std::vector<std::string>{"A", "B"}},
                                                           {7, std::vector<std::string>{"A", "C", "B", "C", "B"}}};
-        CHECK(map_compare(c.kShortestPaths("A", "B", 3), result));
+        CHECK(map_compare(c.kShortestPaths("A", "B", 3), results));
+    }
+    SUBCASE("Reach all other junctions test")
+    {
+        City c;
+        c.addKey("A");
+        c.addRoad("A", "B", 4);
+        c.addRoad("A", "C", 2);
+        c.addRoad("B", "D", 2);
+        c.addRoad("B", "C", 3);
+        c.addRoad("B", "E", 3);
+        c.addRoad("C", "B", 1);
+        c.addRoad("C", "D", 4);
+        c.addRoad("C", "E", 5);
+        c.addRoad("E", "D", 1);
+        CHECK(c.areReachable("A"));
+        CHECK_FALSE(c.areReachable("B"));
+    }
+    SUBCASE("Dead-ends test")
+    {
+        City c;
+        c.addKey("A");
+        c.addRoad("A", "B", 4);
+        c.addRoad("A", "C", 2);
+        c.addRoad("A", "G", 10);
+        c.addRoad("B", "D", 2);
+        c.addRoad("B", "C", 3);
+        c.addRoad("B", "E", 3);
+        c.addRoad("C", "B", 1);
+        c.addRoad("C", "D", 4);
+        c.addRoad("C", "E", 5);
+        c.addRoad("E", "D", 1);
+        std::vector<std::pair<std::string, std::string>> results = {{"A", "G"}, {"B", "D"}, {"C", "D"}, {"E", "D"}};
+        std::vector<std::pair<std::string, std::string>> hm = c.deadEnds();
+        CHECK_EQ(c.deadEnds(), results);
+
     }
 }
