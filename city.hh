@@ -21,9 +21,13 @@ class City
      //for every junction we have a vector of pairs of another junction and distance to it
     std::map<std::string, std::vector<Pair>> city_map;
     std::vector<std::string> closed_junctions;
+
+    void dfs(const std::string&, std::vector<std::string>&); //Depth-first search function
+    int countInDegree(const std::string&); //counts how many streets enter a junction
+    City getTransponse(); //reverses the streets 
+    bool isStronglyConnected(); //used in finding eurelian cyrcle
     public:
     City();
-
     std::map<std::string, std::vector<Pair>>& getMap();
     std::vector<std::string>& getClosedJunctions();
     void setClosedJunctions(const std::vector<std::string>&);
@@ -36,6 +40,7 @@ class City
     std::vector<std::pair<std::string,std::string>> deadEnds();
     std::vector<std::string> shortestPathsFromSource(const std::string&, const std::string&);
     std::map<int, std::vector<std::string>>  kShortestPaths(const std::string&, const std::string&, int k);
+    bool hasEurelianCycle();
 };
 
 #endif

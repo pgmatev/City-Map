@@ -122,4 +122,24 @@ TEST_CASE("Algorithms tests")
         CHECK_EQ(c.deadEnds(), results);
 
     }
+    SUBCASE("Eurelian Circuit")
+    {
+        City c;
+        c.addKey("A");
+        c.addRoad("A", "B", 4);
+        c.addRoad("A", "C", 2);
+        c.addRoad("A", "D", 10);
+        c.addRoad("B", "C", 3);
+        c.addRoad("D", "C", 7);
+        CHECK_FALSE(c.hasEurelianCycle());
+        City c2;
+        c2.addKey("A");
+        c2.addRoad("A", "B", 4);
+        c2.addRoad("B", "C", 2);
+        c2.addRoad("C", "D", 10);
+        c2.addRoad("D", "B", 3);
+        c2.addRoad("B", "G", 7);
+        c2.addRoad("G", "A", 8);
+        CHECK(c2.hasEurelianCycle());
+    }
 }

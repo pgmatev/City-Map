@@ -1,5 +1,89 @@
 #include "city.hh"
 
+void City::dfs(const std::string& source, std::vector<std::string>& visited)
+{
+    visited.push_back(source);
+
+    for(auto it : city_map.find(source)->second)
+    {
+        if(std::find(visited.begin(), visited.end(), it.first) == visited.end()) // if we haven't visited this junction yet
+        {
+            dfs(it.first, visited);
+        }
+    }
+}
+
+int City::countInDegree(const std::string& source)
+{
+    int count = 0;
+    for (auto it : city_map) //iterate all keys
+    {
+        for (auto v : it.second) //iterate adj vectors
+        {
+            if (v.first == source) //if there is a street to the chosen junction, count it 
+            {
+                count++;
+            }
+        }
+    }
+    return count;
+}
+
+City City::getTransponse()
+{
+    City trans_c;
+    for (auto it : city_map)
+    {
+        trans_c.getMap().insert({it.first, std::vector<Pair>()}); //works because insert does not override
+        for (auto v : it.second) //takes all junctions from adj vector and creates a reversed road
+        {
+            auto key = trans_c.getMap().find(v.first);
+            if (key != trans_c.getMap().end())
+            {
+                key->second.push_back({it.first, v.second});
+            }
+            else
+            {
+                std::vector<Pair> new_v = {{it.first, v.second}};
+                trans_c.getMap().insert({v.first, new_v});
+            }
+        }
+    }
+    return trans_c;
+}
+
+bool City::isStronglyConnected() // Kosaraju's DFS based simple algorithm
+{
+    std::vector<std::string> visited;
+    std::string not_dead_end;
+    for (auto it : city_map) 
+    {
+        if (it.second.size() > 0)
+        {
+            not_dead_end = it.first;
+            break; //get a junction that has exiting streets
+        }
+    }
+
+    dfs(not_dead_end, visited);
+    if (visited.size() != city_map.size())
+    {
+        return false;
+    }
+
+    City transposed_city = getTransponse();
+
+    visited.clear();
+    transposed_city.dfs(not_dead_end, visited);
+
+    if (visited.size() != transposed_city.getMap().size())
+    {
+        return false;
+    }
+
+    return true;
+}
+
 City::City()
 {}
 
@@ -341,4 +425,21 @@ std::map<int, std::vector<std::string>> City::kShortestPaths(const std::string& 
     }
 
     return results;
+}
+
+bool City::hasEurelianCycle()
+{
+    if (!isStronglyConnected()) //1. the graph should be strongly connected
+    {
+        return false;
+    }
+    for (auto it : city_map) //2. the In-degree and Out-degree should be equal 
+                            //(every junction has to have the same amount of streets entering and exiting it)
+    {
+        if (it.second.size() != countInDegree(it.first))
+        {
+            return false;
+        }
+    }
+    return true;
 }
