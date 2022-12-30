@@ -1,5 +1,7 @@
 #include "city.hh"
 
+// ==========/ Private Helper Methods /==========
+
 void City::dfs(const std::string& source, std::vector<std::string>& visited)
 {
     visited.push_back(source);
@@ -9,6 +11,20 @@ void City::dfs(const std::string& source, std::vector<std::string>& visited)
         if(std::find(visited.begin(), visited.end(), it.first) == visited.end()) // if we haven't visited this junction yet
         {
             dfs(it.first, visited);
+        }
+    }
+}
+
+//traversing the roads instead of the junctions (pair of junctions)
+void City::dfsRoads(const std::string& source, std::vector<std::pair<std::string, std::string>>& visited)
+{
+    for(auto it : city_map.find(source)->second)
+    {
+        std::pair<std::string, std::string> road = {source, it.first};
+        if(std::find(visited.begin(), visited.end(), road) == visited.end()) // if we haven't visited this junction yet
+        {
+            visited.push_back(road);
+            dfsRoads(it.first, visited);
         }
     }
 }
@@ -84,6 +100,34 @@ bool City::isStronglyConnected() // Kosaraju's DFS based simple algorithm
     return true;
 }
 
+bool City::hasEurelianPath()
+{
+    if (!isStronglyConnected()) //1. the graph should be strongly connected
+    {
+        return false;
+    }
+    for (auto it : city_map) //2. the In-degree and Out-degree should be equal 
+                            //(every junction has to have the same amount of streets entering and exiting it)
+    {
+        if (it.second.size() != countInDegree(it.first))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool City::isBridge(const std::string& u, const std::string& v)
+{
+    std::vector<std::pair<std::string, std::string>> visited1;
+    dfsRoads(u, visited1); //firstly check all reachable junctions from u
+    std::vector<std::pair<std::string, std::string>> visited2;
+    visited2.push_back({u, v});
+    dfsRoads(u, visited2); //then check all reachable junctions from u without the u-v road
+    return visited1.size() > visited2.size(); //if with u-v we can reach more junctions it means its a bridge
+}
+
+// ==========/ Initialisation Methods /==========
 City::City()
 {}
 
@@ -147,6 +191,8 @@ void City::addRoad(const std::string& key, const std::string& junction, int dist
     std::pair new_p = {junction, distance};
     city_map.find(key)->second.push_back(new_p);
 }
+
+// ==========/ Functionality /==========
 
 bool City::hasPath(const std::string& source, const std::string& destination) 
 {
@@ -427,19 +473,60 @@ std::map<int, std::vector<std::string>> City::kShortestPaths(const std::string& 
     return results;
 }
 
-bool City::hasEurelianCycle()
+std::vector<std::string> City::generateEurelianPath()
 {
-    if (!isStronglyConnected()) //1. the graph should be strongly connected
+    std::vector<std::string> path;
+    if(!hasEurelianPath())
     {
-        return false;
+        return path;
     }
-    for (auto it : city_map) //2. the In-degree and Out-degree should be equal 
-                            //(every junction has to have the same amount of streets entering and exiting it)
+    std::string source;
+
+    for (auto it : city_map)
     {
-        if (it.second.size() != countInDegree(it.first))
+        if (it.second.size() % 2 != 0)
         {
-            return false;
+            source = it.first; //start from a junction that has an odd degree(has odd number of streets exiting it)
+            break;
         }
     }
-    return true;
+    if (source.empty())
+    {
+        source = city_map.begin()->first; //if all junctions have an even degree, start from the first
+    }
+    path.push_back(source);
+    std::vector<std::pair<std::string, std::string>> visited;
+    generateEurelianPathHelper(source, path, visited);
+    return path;
+
+
+}
+
+//TO DO: Hierholzer's Algorithm
+void City::generateEurelianPathHelper(const std::string& source, std::vector<std::string>& path, std::vector<std::pair<std::string, std::string>>& visited)
+{
+    auto iterator = city_map.find(source);
+    // if (iterator->second.size() == 1)
+    // {
+    //     path.push_back(iterator->second[0].first);
+    //     visited.push_back({source, iterator->second[0].first});
+    //     generateEurelianPathHelper(iterator->second[0].first, path, visited);
+    // }
+    // else
+    // {
+        for (auto it : iterator->second)
+        {
+            // if (!isBridge(source, it.first))
+            // {
+                std::pair<std::string, std::string> road = {source, it.first};
+                if (std::find(visited.begin(), visited.end(), road) == visited.end())
+                {
+                    path.push_back(it.first);
+                    visited.push_back(road);
+                    generateEurelianPathHelper(it.first, path, visited);
+                }
+            // }
+        }
+    // }
+
 }

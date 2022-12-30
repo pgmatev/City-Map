@@ -122,7 +122,7 @@ TEST_CASE("Algorithms tests")
         CHECK_EQ(c.deadEnds(), results);
 
     }
-    SUBCASE("Eurelian Circuit")
+    SUBCASE("Eurelian Circuit test")
     {
         City c;
         c.addKey("A");
@@ -131,7 +131,7 @@ TEST_CASE("Algorithms tests")
         c.addRoad("A", "D", 10);
         c.addRoad("B", "C", 3);
         c.addRoad("D", "C", 7);
-        CHECK_FALSE(c.hasEurelianCycle());
+        CHECK_FALSE(c.hasEurelianPath());
         City c2;
         c2.addKey("A");
         c2.addRoad("A", "B", 4);
@@ -140,6 +140,33 @@ TEST_CASE("Algorithms tests")
         c2.addRoad("D", "B", 3);
         c2.addRoad("B", "G", 7);
         c2.addRoad("G", "A", 8);
-        CHECK(c2.hasEurelianCycle());
+        CHECK(c2.hasEurelianPath());
+    }
+    SUBCASE("Generate Path test")
+    {
+        City c;
+        c.addKey("A");
+        c.addRoad("A", "B", 4);
+        c.addRoad("A", "C", 2);
+        c.addRoad("A", "D", 10);
+        c.addRoad("B", "C", 3);
+        c.addRoad("D", "C", 7);
+        std::vector<std::string> result;
+        CHECK_EQ(c.generateEurelianPath(), result);
+        City c2;
+        c2.addKey("A");
+        c2.addRoad("A", "B", 4);
+        c2.addRoad("B", "G", 7);
+        c2.addRoad("B", "C", 2);
+        c2.addRoad("C", "D", 10);
+        c2.addRoad("D", "B", 3);
+        c2.addRoad("G", "A", 8);
+        std::vector<std::string> result2 = {"A", "B", "C", "D", "B", "G", "A"};
+        for (auto it : c2.generateEurelianPath())
+        {
+            std::cout << it << " ";
+        }
+        std::cout << std::endl;
+        CHECK_EQ(c2.generateEurelianPath(), result2);
     }
 }
