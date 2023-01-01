@@ -184,3 +184,20 @@ void Program::threeShortestPaths(const std::string& source, const std::string& d
         std::cout << "= " << i.first << std::endl;
     }
 }
+
+void Program::touristLap()
+{
+    std::vector<std::string> reversed_lap = loaded_city.generateEurelianCircuit();
+    if (reversed_lap.empty())
+    {
+        std::cout << "No such lap exists.";
+        return;
+    }
+
+    std::cout << "Possible lap: ";
+    for (auto it = reversed_lap.rbegin(); it != reversed_lap.rend(); ++it) //reversed iterator, incrementing is actually decrementing
+    {
+        std::cout << (*it) << " ";
+    }
+    std::cout << std::endl;
+}

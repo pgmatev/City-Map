@@ -30,6 +30,7 @@ class Program
     void areReachable(const std::string&);
     void deadEnds();
     void threeShortestPaths(const std::string&, const std::string&);
+    void touristLap();
 
 };
 

@@ -17,4 +17,5 @@ int main()
     p.hasCycle(s1);
     p.threeShortestPaths(s1, s2);
     p.deadEnds();
+    p.touristLap();
 }

@@ -100,7 +100,7 @@ bool City::isStronglyConnected() // Kosaraju's DFS based simple algorithm
     return true;
 }
 
-bool City::hasEurelianPath()
+bool City::hasEurelianCircle()
 {
     if (!isStronglyConnected()) //1. the graph should be strongly connected
     {
@@ -473,60 +473,38 @@ std::map<int, std::vector<std::string>> City::kShortestPaths(const std::string& 
     return results;
 }
 
-std::vector<std::string> City::generateEurelianPath()
+std::vector<std::string> City::generateEurelianCircuit() //Hierholzer's algorithm
 {
-    std::vector<std::string> path;
-    if(!hasEurelianPath())
+    std::vector<std::string> final_path;
+    if(!hasEurelianCircle())
     {
-        return path;
+        return final_path;
     }
-    std::string source;
+    
+    std::stack<std::string> curr_path;
+    std::vector<std::pair<std::string, std::string>> visited; //visited roads
+    curr_path.push(city_map.begin()->first);
 
-    for (auto it : city_map)
+    while (!curr_path.empty())
     {
-        if (it.second.size() % 2 != 0)
+        std::string curr_j = curr_path.top();
+        bool flag = false; //flag to check if all exiting roads are visited for the current junction
+        for (auto it : city_map.find(curr_j)->second)
         {
-            source = it.first; //start from a junction that has an odd degree(has odd number of streets exiting it)
-            break;
+            std::pair<std::string, std::string> road = {curr_j, it.first};
+            if (std::find(visited.begin(), visited.end(), road) == visited.end())
+            {
+                flag = true;
+                visited.push_back(road);
+                curr_path.push(it.first);
+                break;
+            }
+        }
+        if (!flag)
+        {
+            final_path.push_back(curr_j);
+            curr_path.pop();
         }
     }
-    if (source.empty())
-    {
-        source = city_map.begin()->first; //if all junctions have an even degree, start from the first
-    }
-    path.push_back(source);
-    std::vector<std::pair<std::string, std::string>> visited;
-    generateEurelianPathHelper(source, path, visited);
-    return path;
-
-
-}
-
-//TO DO: Hierholzer's Algorithm
-void City::generateEurelianPathHelper(const std::string& source, std::vector<std::string>& path, std::vector<std::pair<std::string, std::string>>& visited)
-{
-    auto iterator = city_map.find(source);
-    // if (iterator->second.size() == 1)
-    // {
-    //     path.push_back(iterator->second[0].first);
-    //     visited.push_back({source, iterator->second[0].first});
-    //     generateEurelianPathHelper(iterator->second[0].first, path, visited);
-    // }
-    // else
-    // {
-        for (auto it : iterator->second)
-        {
-            // if (!isBridge(source, it.first))
-            // {
-                std::pair<std::string, std::string> road = {source, it.first};
-                if (std::find(visited.begin(), visited.end(), road) == visited.end())
-                {
-                    path.push_back(it.first);
-                    visited.push_back(road);
-                    generateEurelianPathHelper(it.first, path, visited);
-                }
-            // }
-        }
-    // }
-
+    return final_path; //returns the path in reverse
 }

@@ -4,6 +4,7 @@
 #include <map>
 #include <vector>
 #include <queue>
+#include <stack>
 #include <tuple>
 #include <utility> //for pair
 #include <algorithm> //for std::find
@@ -28,7 +29,6 @@ private:
     bool isStronglyConnected(); //used in finding eurelian cyrcle
     // bool hasEurelianPath();
     // bool isBridge(const std::string&, const std::string&);
-    void generateEurelianPathHelper(const std::string&, std::vector<std::string>&, std::vector<std::pair<std::string, std::string>>&);
 
 public:
     City();
@@ -36,7 +36,7 @@ public:
     std::vector<std::string>& getClosedJunctions();
     void setClosedJunctions(const std::vector<std::string>&);
 
-    bool hasEurelianPath(); //should be private
+    bool hasEurelianCircle(); //should be private
     bool isBridge(const std::string&, const std::string&); //should be private
 
     void addKey(const std::string&);
@@ -47,7 +47,7 @@ public:
     std::vector<std::pair<std::string,std::string>> deadEnds();
     std::vector<std::string> shortestPathsFromSource(const std::string&, const std::string&);
     std::map<int, std::vector<std::string>>  kShortestPaths(const std::string&, const std::string&, int k);
-    std::vector<std::string> generateEurelianPath();
+    std::vector<std::string> generateEurelianCircuit();
 };
 
 #endif
