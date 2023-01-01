@@ -27,17 +27,14 @@ private:
     int countInDegree(const std::string&); //counts how many streets enter a junction
     City getTransponse(); //reverses the streets 
     bool isStronglyConnected(); //used in finding eurelian cyrcle
-    // bool hasEurelianPath();
-    // bool isBridge(const std::string&, const std::string&);
+    bool hasEurelianCycle();
+    bool isBridge(const std::string&, const std::string&);
 
 public:
     City();
     std::map<std::string, std::vector<Pair>>& getMap();
     std::vector<std::string>& getClosedJunctions();
     void setClosedJunctions(const std::vector<std::string>&);
-
-    bool hasEurelianCircle(); //should be private
-    bool isBridge(const std::string&, const std::string&); //should be private
 
     void addKey(const std::string&);
     void addRoad(const std::string&, const std::string&, int);

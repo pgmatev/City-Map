@@ -100,7 +100,7 @@ bool City::isStronglyConnected() // Kosaraju's DFS based simple algorithm
     return true;
 }
 
-bool City::hasEurelianCircle()
+bool City::hasEurelianCycle()
 {
     if (!isStronglyConnected()) //1. the graph should be strongly connected
     {
@@ -476,7 +476,7 @@ std::map<int, std::vector<std::string>> City::kShortestPaths(const std::string& 
 std::vector<std::string> City::generateEurelianCircuit() //Hierholzer's algorithm
 {
     std::vector<std::string> final_path;
-    if(!hasEurelianCircle())
+    if(!hasEurelianCycle())
     {
         return final_path;
     }

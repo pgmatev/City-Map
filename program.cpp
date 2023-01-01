@@ -190,7 +190,7 @@ void Program::touristLap()
     std::vector<std::string> reversed_lap = loaded_city.generateEurelianCircuit();
     if (reversed_lap.empty())
     {
-        std::cout << "No such lap exists.";
+        std::cout << "No such lap exists." << std::endl;
         return;
     }
 
