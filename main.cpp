@@ -2,18 +2,6 @@
 
 int main(int argc, char **argv)
 {
-    // std::ifstream file("test.txt");
-    // Program p;
-    // p.takeInput(file);
-    // std::string cj = "A B C";
-    // p.passClosedJunctions(cj);
-    // std::ofstream dotty("graph.dot");
-    // p.toDotty(dotty);
-
-    // p.closeJunction("A");
-    // p.openJunction("A");
-    // p.openJunction("G");
-    // p.closeJunction("A");
     try
     {
         Program p;

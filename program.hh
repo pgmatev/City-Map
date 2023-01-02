@@ -21,7 +21,7 @@ class Program
     void toDottyHelper(std::ostream&);
 
     public:
-    void takeInput(const std::string& filename);
+    void takeInput(const std::string&, const std::string&, const std::string&);
     void passClosedJunctions(const std::string&);
     void printMap();
     void printLocation();

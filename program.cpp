@@ -2,7 +2,7 @@
 
 void Program::run(int argc, char* argv[])
 {
-    if (argc == 1)
+    if (argc == 1) //not starting in interactive mode
     {
         return;
     }
@@ -13,11 +13,8 @@ void Program::run(int argc, char* argv[])
 
     if (strcmp(argv[1], "-i") == 0)
     {
-        takeInput(argv[2]);
         std::string dotty = "graph.dot";
-        toDotty(dotty);
-        std::string starting_location = argv[3];
-        changeLocation(starting_location);
+        takeInput(argv[2], dotty, argv[3]); //load the map 
         std::cout << "Interactive mode initialised, type \"exit\" to quit" << std::endl;
         std::string input;
         while (input != "exit")
@@ -28,22 +25,27 @@ void Program::run(int argc, char* argv[])
             if (input == "location")
             {
                 printLocation();
+                continue;
             }
             if (input == "neighbours")
             {
                 printNeighbours();
+                continue;
             }
             if (input == "closed")
             {
                 printClosedJunctions();
+                continue;
             }
             if (input == "tour")
             {
                 touristLap();
+                continue;
             }
             if (input == "dead-ends")
             {
                 deadEnds();
+                continue;
             }
             //==/ multiple argument commands /==
             std::stringstream ss(input);
@@ -63,6 +65,7 @@ void Program::run(int argc, char* argv[])
                     }
                     changeLocation(commands[1]);
                     toDotty(dotty); //updates visual map
+                    continue;
                 }
                 if (commands[0] == "move")
                 {
@@ -72,6 +75,7 @@ void Program::run(int argc, char* argv[])
                     }
                     move(commands[1]);
                     toDotty(dotty); //updates visual map
+                    continue;
                 }
                 if (commands[0] == "close")
                 {
@@ -81,6 +85,7 @@ void Program::run(int argc, char* argv[])
                     }
                     closeJunction(commands[1]);
                     toDotty(dotty); //updates visual map
+                    continue;
                 }
                 if (commands[0] == "open")
                 {
@@ -90,6 +95,7 @@ void Program::run(int argc, char* argv[])
                     }
                     openJunction(commands[1]);
                     toDotty(dotty); //updates visual map
+                    continue;
                 }
                 if (commands[0] == "path")
                 {
@@ -98,6 +104,7 @@ void Program::run(int argc, char* argv[])
                         throw std::invalid_argument("The command \"path\" takes 2 arguments");
                     }
                     hasPath(commands[1], commands[2]);
+                    continue;
                 }
                 if (commands[0] == "cycle")
                 {
@@ -106,6 +113,7 @@ void Program::run(int argc, char* argv[])
                         throw std::invalid_argument("The command \"path\" takes 1 argument");
                     }
                     hasCycle(commands[1]);
+                    continue;
                 }
                 if (commands[0] == "reachable")
                 {
@@ -114,6 +122,7 @@ void Program::run(int argc, char* argv[])
                         throw std::invalid_argument("The command \"reachable\" takes 1 argument");
                     }
                     areReachable(commands[1]);
+                    continue;
                 }
                 if (commands[0] == "shortest-paths")
                 {
@@ -122,6 +131,7 @@ void Program::run(int argc, char* argv[])
                         throw std::invalid_argument("The command \"shortest-paths\" takes 2 arguments");
                     }
                     threeShortestPaths(commands[1], commands[2]);
+                    continue;
                 }
             }
             catch (std::invalid_argument& e)
@@ -138,7 +148,7 @@ bool Program::isNewLine(char c)
            c == '\n';
 }
 
-void Program::takeInput(const std::string& filename)
+void Program::takeInput(const std::string& filename, const std::string& dot_filename, const std::string& starting_location)
 {
     std::ifstream in(filename);
     bool isKey = true;
@@ -183,6 +193,8 @@ void Program::takeInput(const std::string& filename)
             }
         }
     }
+    changeLocation(starting_location);
+    toDotty(dot_filename);
     in.close();
 }
 
@@ -192,7 +204,15 @@ void Program::passClosedJunctions(const std::string& s)
     std::istream_iterator<std::string> begin(ss);
     std::istream_iterator<std::string> end;
     std::vector<std::string> v(begin, end);
-    loaded_city.setClosedJunctions(v);
+    try
+    {
+        loaded_city.setClosedJunctions(v);
+    }
+    catch (std::invalid_error& e)
+    {
+        std::cout << e.what() << std::endl;
+    }
+
 }
 
 void Program::printMap()
