@@ -22,6 +22,8 @@ private:
      //for every junction we have a vector of pairs of another junction and distance to it
     std::map<std::string, std::vector<Pair>> city_map;
     std::vector<std::string> closed_junctions;
+    std::string location;
+    bool isClosed(const std::string&);
     void dfs(const std::string&, std::vector<std::string>&); //Depth-first search function
     void dfsRoads(const std::string&, std::vector<std::pair<std::string, std::string>>&);
     int countInDegree(const std::string&); //counts how many streets enter a junction
@@ -34,7 +36,14 @@ public:
     City();
     std::map<std::string, std::vector<Pair>>& getMap();
     std::vector<std::string>& getClosedJunctions();
+    std::string getLocation();
+    std::vector<Pair> getNeighbours();
+    void setLocation(const std::string&);
     void setClosedJunctions(const std::vector<std::string>&);
+
+    std::vector<std::string> move(const std::string&); //moves current location and returns the path to the new one
+    void closeJunction(const std::string&);
+    void openJunction(const std::string&);
 
     void addKey(const std::string&);
     void addRoad(const std::string&, const std::string&, int);

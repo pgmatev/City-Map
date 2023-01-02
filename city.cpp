@@ -1,6 +1,10 @@
 #include "city.hh"
 
 // ==========/ Private Helper Methods /==========
+bool City::isClosed(const std::string& junction)
+{
+    return std::find(closed_junctions.begin(), closed_junctions.end(), junction) != closed_junctions.end();
+}
 
 void City::dfs(const std::string& source, std::vector<std::string>& visited)
 {
@@ -141,6 +145,25 @@ std::vector<std::string>& City::getClosedJunctions()
     return this->closed_junctions;
 }
 
+std::string City::getLocation()
+{
+    return this->location;
+}
+
+std::vector<Pair> City::getNeighbours()
+{
+    return city_map.find(this->location)->second;
+}
+
+void City::setLocation(const std::string& new_location)
+{
+    if (city_map.find(new_location) == city_map.end())
+    {
+        throw std::invalid_argument("Location does not exist!");
+    }
+    this->location = new_location;
+}
+
 void City::setClosedJunctions(const std::vector<std::string>& v)
 {
     for (auto i : v)
@@ -151,6 +174,50 @@ void City::setClosedJunctions(const std::vector<std::string>& v)
         }
     }
     this->closed_junctions = v;
+}
+
+std::vector<std::string> City::move(const std::string& new_location)
+{
+    if(!hasPath(location, new_location))
+    {
+        throw std::invalid_argument("There is no path.");
+    }
+    if (location == new_location)
+    {
+        throw std::invalid_argument("Already there.");
+    }
+    std::map<int, std::vector<std::string>> shortest_path = kShortestPaths(location, new_location, 1); //only get the shortest possible path
+    location = new_location;
+    return shortest_path.begin()->second;
+}
+
+void City::closeJunction(const std::string& junction)
+{
+    if (city_map.find(junction) == city_map.end())
+    {
+        throw std::invalid_argument("Junction does not exist!");
+    }
+
+    if (isClosed(junction))
+    {
+        throw std::invalid_argument("Junction already closed");
+    }
+
+    closed_junctions.push_back(junction);
+}
+
+void City::openJunction(const std::string& junction)
+{
+    if (city_map.find(junction) == city_map.end())
+    {
+        throw std::invalid_argument("Junction does not exist!");
+    }
+
+    if (!isClosed(junction))
+    {
+        throw std::invalid_argument("Junction already opened");
+    }
+    closed_junctions.erase(std::remove(closed_junctions.begin(), closed_junctions.end(), junction));
 }
 
 void City::addKey(const std::string& s)
@@ -206,7 +273,7 @@ bool City::hasPath(const std::string& source, const std::string& destination)
         throw std::invalid_argument("Destination does not exist!");
     }
 
-    if (source == destination)
+    if (source == destination && !isClosed(destination))
     {
         return true;
     }
@@ -223,12 +290,12 @@ bool City::hasPath(const std::string& source, const std::string& destination)
         queue.pop();
         for (auto i : city_map.find(s)->second)
         {
-            if (i.first == destination)
+            if (i.first == destination && !isClosed(i.first))
             {
                 return true;
             }
 
-            if(std::find(visited.begin(), visited.end(), i.first) == visited.end()) // if we haven't visited this junction yet
+            if((std::find(visited.begin(), visited.end(), i.first) == visited.end()) && !isClosed(i.first)) // if we haven't visited this junction yet
             {
                 visited.push_back(i.first);
                 queue.push(i.first);
@@ -390,7 +457,7 @@ std::vector<std::string> City::shortestPathsFromSource(const std::string& source
         {
             std::string j = i.first; //get the name of the adj junction
             int d = i.second; // get the distance to the adj junction
-            if (std::find(closed_junctions.begin(), closed_junctions.end(), j) == closed_junctions.end()) //if junction is not closed
+            if (!isClosed(j)) //if junction is not closed
             {
                 if (dist.find(j)->second > dist.find(curr)->second + d)
                 //if the saved distance to j is bigger than the newly found path to it through curr
@@ -460,7 +527,7 @@ std::map<int, std::vector<std::string>> City::kShortestPaths(const std::string& 
 
         for (auto adjacent : city_map.find(junction)->second) //queue all adjacent junctions to current be traversed
         {
-            if (std::find(closed_junctions.begin(), closed_junctions.end(), adjacent.first) == closed_junctions.end()) //if junction is not closed
+            if (!isClosed(adjacent.first)) //if junction is not closed
             {
                 std::vector<std::string> new_path = path;
                 new_path.push_back(adjacent.first);

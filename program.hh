@@ -3,6 +3,7 @@
 
 #include "city.hh"
 
+#include <cstring>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -12,6 +13,7 @@ class Program
 {
     private:
     City loaded_city;
+    std::string location;
 
     bool isNumber(char);
     bool isNewLine(char);
@@ -19,11 +21,18 @@ class Program
     void toDottyHelper(std::ostream&);
 
     public:
-    void takeInput(std::ifstream&);
+    void takeInput(const std::string& filename);
     void passClosedJunctions(const std::string&);
     void printMap();
-    
-    void toDotty(std::ostream&);
+    void printLocation();
+    void printClosedJunctions();
+    void toDotty(const std::string&);
+
+    void changeLocation(const std::string&);
+    void printNeighbours();
+    void move(const std::string&);
+    void closeJunction(const std::string&);
+    void openJunction(const std::string&);
 
     void hasPath(const std::string&, const std::string&);
     void hasCycle(const std::string&);
@@ -31,6 +40,8 @@ class Program
     void deadEnds();
     void threeShortestPaths(const std::string&, const std::string&);
     void touristLap();
+
+    void run(int, char**);
 
 };
 

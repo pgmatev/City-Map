@@ -1,13 +1,146 @@
 #include "program.hh"
 
+void Program::run(int argc, char* argv[])
+{
+    if (argc == 1)
+    {
+        return;
+    }
+    if (argc != 4)
+    {
+        throw std::invalid_argument("Wrong number of arguments!");
+    }
+
+    if (strcmp(argv[1], "-i") == 0)
+    {
+        takeInput(argv[2]);
+        std::string dotty = "graph.dot";
+        toDotty(dotty);
+        std::string starting_location = argv[3];
+        changeLocation(starting_location);
+        std::cout << "Interactive mode initialised, type \"exit\" to quit" << std::endl;
+        std::string input;
+        while (input != "exit")
+        {
+            std::cout << ">";
+            std::getline(std::cin, input);
+            //==/ no argument commands /==
+            if (input == "location")
+            {
+                printLocation();
+            }
+            if (input == "neighbours")
+            {
+                printNeighbours();
+            }
+            if (input == "closed")
+            {
+                printClosedJunctions();
+            }
+            if (input == "tour")
+            {
+                touristLap();
+            }
+            if (input == "dead-ends")
+            {
+                deadEnds();
+            }
+            //==/ multiple argument commands /==
+            std::stringstream ss(input);
+            std::string s;
+            std::vector<std::string> commands;
+            while(ss >> s)
+            {
+                commands.push_back(s); //splitting the input by command arguments
+            }
+            try
+            {
+                if (commands[0] == "change")
+                {
+                    if (commands.size() != 2)
+                    {
+                        throw std::invalid_argument("The command \"change\" takes 1 argument");
+                    }
+                    changeLocation(commands[1]);
+                    toDotty(dotty); //updates visual map
+                }
+                if (commands[0] == "move")
+                {
+                    if (commands.size() != 2)
+                    {
+                        throw std::invalid_argument("The command \"move\" takes 1 argument");
+                    }
+                    move(commands[1]);
+                    toDotty(dotty); //updates visual map
+                }
+                if (commands[0] == "close")
+                {
+                    if (commands.size() != 2)
+                    {
+                        throw std::invalid_argument("The command \"close\" takes 1 argument");
+                    }
+                    closeJunction(commands[1]);
+                    toDotty(dotty); //updates visual map
+                }
+                if (commands[0] == "open")
+                {
+                    if (commands.size() != 2)
+                    {
+                        throw std::invalid_argument("The command \"open\" takes 1 argument");
+                    }
+                    openJunction(commands[1]);
+                    toDotty(dotty); //updates visual map
+                }
+                if (commands[0] == "path")
+                {
+                    if (commands.size() != 3)
+                    {
+                        throw std::invalid_argument("The command \"path\" takes 2 arguments");
+                    }
+                    hasPath(commands[1], commands[2]);
+                }
+                if (commands[0] == "cycle")
+                {
+                    if (commands.size() != 2)
+                    {
+                        throw std::invalid_argument("The command \"path\" takes 1 argument");
+                    }
+                    hasCycle(commands[1]);
+                }
+                if (commands[0] == "reachable")
+                {
+                    if (commands.size() != 2)
+                    {
+                        throw std::invalid_argument("The command \"reachable\" takes 1 argument");
+                    }
+                    areReachable(commands[1]);
+                }
+                if (commands[0] == "shortest-paths")
+                {
+                    if (commands.size() != 3)
+                    {
+                        throw std::invalid_argument("The command \"shortest-paths\" takes 2 arguments");
+                    }
+                    threeShortestPaths(commands[1], commands[2]);
+                }
+            }
+            catch (std::invalid_argument& e)
+            {
+                std::cout << e.what() << std::endl;
+            }
+        }
+    }
+}
+
 bool Program::isNewLine(char c)
 {
     return c == '\r' || // also a new line symbol
            c == '\n';
 }
 
-void Program::takeInput(std::ifstream& in)
+void Program::takeInput(const std::string& filename)
 {
+    std::ifstream in(filename);
     bool isKey = true;
     std::string loaded_key;
     std::string s;
@@ -50,6 +183,7 @@ void Program::takeInput(std::ifstream& in)
             }
         }
     }
+    in.close();
 }
 
 void Program::passClosedJunctions(const std::string& s)
@@ -74,13 +208,30 @@ void Program::printMap()
     }
 }
 
-void Program::toDotty(std::ostream& out) // writes to a file in the .dot language syntax
+void Program::printLocation()
+{
+    std::cout << "Current location: " << loaded_city.getLocation() << std::endl;
+}
+
+void Program::printClosedJunctions()
+{
+    std::cout << "Closed junctions: ";
+    std::vector<std::string> closed_junctions = loaded_city.getClosedJunctions();
+    for (auto v : closed_junctions)
+    {
+        std::cout << v << " ";
+    }
+    std::cout << std::endl;
+}
+
+void Program::toDotty(const std::string& filename) // writes to a file in the .dot language syntax
 {                                       // visualisation of the graph using graphviz
+    std::ofstream out(filename);
     out << "digraph G {\n";
     toDottyHelper(out);
     out << "}";
+    out.close();
 }
-
 void Program::toDottyHelper(std::ostream& out)
 {
     for (auto it : loaded_city.getMap())
@@ -90,17 +241,103 @@ void Program::toDottyHelper(std::ostream& out)
                       loaded_city.getClosedJunctions().end(),
                       j1->first) == loaded_city.getClosedJunctions().end()) //if the junction is not closed
         {
-            out << (long)&j1->first << "[label=\"" << j1->first << "\"];\n";
+            if (j1->first == loaded_city.getLocation())
+            {
+                out << (long)&j1->first << "[label=\"" << j1->first << "\" fontcolor = \"blue\"];\n";
+            }
+            else
+            {
+                out << (long)&j1->first << "[label=\"" << j1->first << "\"];\n";
+            }
         }
         else // if the junction is closed
         {
-            out << (long)&j1->first << "[label=\"" << j1->first << "\" color = \"red\"];\n";
+            if (j1->first == loaded_city.getLocation())
+            {
+                out << (long)&j1->first << "[label=\"" << j1->first << "\" color = \"red\" fontcolor = \"blue\"];\n";
+            }
+            else
+            {
+                out << (long)&j1->first << "[label=\"" << j1->first << "\" color = \"red\"];\n";
+            }
+
         }
         for (auto v : j1->second)
         {
             auto j2 = loaded_city.getMap().find(v.first);
             out << (long)&j1->first << "->" << (long)&j2->first << "[label = \""<< v.second << "\" color = \"blue\"]\n";
         }
+    }
+}
+
+void Program::changeLocation(const std::string& new_location)
+{
+    try
+    {
+        loaded_city.setLocation(new_location);
+    }
+    catch (std::invalid_argument& e)
+    {
+        std::cout << e.what() << std::endl;
+    }
+}
+
+void Program::printNeighbours()
+{
+    std::vector<std::pair<std::string, int>> neighbours = loaded_city.getNeighbours();
+    std::cout << "Neighbours of " << loaded_city.getLocation() << ": ";
+    for (auto v : neighbours)
+    {
+        std::cout << "("<< v.first << ", distance " << v.second << ") ";
+    }
+    std::cout << std::endl;
+}
+
+void Program::move(const std::string& new_location)
+{
+    try
+    {
+        std::cout << "Moving from " << loaded_city.getLocation() << " to " << new_location << "...\n";
+        std::vector<std::string> path = loaded_city.move(new_location);
+        for (auto it = path.begin(); it != path.end(); ++it)
+        {
+            std::cout << *it; //it is iterator pointing towards the string
+            if (std::next(it) != path.end()) //doesn't put arrow after last element
+            {
+                std::cout << "->";
+            }
+        }
+        std::cout << std::endl;
+    }
+    catch (std::invalid_argument& e)
+    {
+        std::cout << e.what() << std::endl;
+    }
+}
+
+void Program::closeJunction(const std::string& junction)
+{
+    try
+    {   
+        loaded_city.closeJunction(junction);
+        std::cout << "Closing " << junction << std::endl;
+    }
+    catch(std::invalid_argument& e)
+    {
+        std::cout << e.what() << std::endl;
+    }
+}
+
+void Program::openJunction(const std::string& junction)
+{
+    try
+    {   
+        loaded_city.openJunction(junction);
+        std::cout << "Opening " << junction << std::endl;
+    }
+    catch(std::invalid_argument& e)
+    {
+        std::cout << e.what() << std::endl;
     }
 }
 
