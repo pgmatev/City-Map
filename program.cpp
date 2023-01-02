@@ -110,7 +110,7 @@ void Program::run(int argc, char* argv[])
                 {
                     if (commands.size() != 2)
                     {
-                        throw std::invalid_argument("The command \"path\" takes 1 argument");
+                        throw std::invalid_argument("The command \"cycle\" takes 1 argument");
                     }
                     hasCycle(commands[1]);
                     continue;
@@ -208,7 +208,7 @@ void Program::passClosedJunctions(const std::string& s)
     {
         loaded_city.setClosedJunctions(v);
     }
-    catch (std::invalid_error& e)
+    catch (std::invalid_argument& e)
     {
         std::cout << e.what() << std::endl;
     }

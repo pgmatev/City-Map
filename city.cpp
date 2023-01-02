@@ -330,7 +330,7 @@ bool City::hasCycle(const std::string& source)
                 return true;
             }
 
-            if(std::find(visited.begin(), visited.end(), i.first) == visited.end()) // if we haven't visited this junction yet
+            if(std::find(visited.begin(), visited.end(), i.first) == visited.end() && !isClosed(i.first)) // if we haven't visited this junction yet and it isn't closed
             {
                 visited.push_back(i.first);
                 queue.push(i.first);

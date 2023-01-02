@@ -34,6 +34,43 @@ TEST_CASE("Map creation test")
         REQUIRE_EQ(c.getMap().find("A")->second.size(), 1);
         REQUIRE_EQ(c.getMap().find("A")->second[0].second, 100);
     }
+    SUBCASE("Close/open junction test")
+    {
+        City c;
+        c.addKey("A");
+        // CHECK_FALSE(c.isClosed("A"));
+        std::vector<std::string> result = {"A"};
+        CHECK_FALSE(c.getClosedJunctions() == result);
+        c.closeJunction("A");
+        CHECK_EQ(c.getClosedJunctions(), result);
+        c.openJunction("A");
+        CHECK_FALSE(c.getClosedJunctions() == result);
+    }
+    SUBCASE("Move location test")
+    {
+        City c;
+        c.addKey("A");
+        c.addRoad("A", "B", 100);
+        c.setLocation("A");
+        CHECK_EQ(c.getLocation(), "A");
+        c.move("B");
+        CHECK_EQ(c.getLocation(), "B");
+        c.closeJunction("A");
+        CHECK_THROWS(c.move("A"));
+    }
+    SUBCASE("Change location test")
+    {
+        City c;
+        c.addKey("A");
+        c.addRoad("A", "B", 100);
+        c.setLocation("A");
+        CHECK_EQ(c.getLocation(), "A");
+        c.setLocation("B");
+        CHECK_EQ(c.getLocation(), "B");
+        c.closeJunction("A");
+        c.setLocation("A");
+        CHECK_EQ(c.getLocation(), "A"); 
+    }
 }
 
 TEST_CASE("Algorithms tests")
@@ -143,11 +180,6 @@ TEST_CASE("Algorithms tests")
         c2.addRoad("D", "B", 3);
         c2.addRoad("G", "A", 8);
         std::vector<std::string> result2 = {"A", "G", "B", "D", "C", "B", "A"};
-        for (auto it : c2.generateEurelianCircuit())
-        {
-            std::cout << it << " ";
-        }
-        std::cout << std::endl;
         CHECK_EQ(c2.generateEurelianCircuit(), result2);
     }
 }
