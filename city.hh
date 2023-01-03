@@ -1,6 +1,7 @@
 #ifndef MAP_HH
 #define MAP_HH
 
+#include <unordered_map>
 #include <map>
 #include <vector>
 #include <queue>
@@ -20,7 +21,7 @@ class City
 {
 private:
      //for every junction we have a vector of pairs of another junction and distance to it
-    std::map<std::string, std::vector<Pair>> city_map;
+    std::unordered_map<std::string, std::vector<Pair>> city_map;
     std::vector<std::string> closed_junctions;
     std::string location;
     bool isClosed(const std::string&);
@@ -34,7 +35,7 @@ private:
 
 public:
     City();
-    std::map<std::string, std::vector<Pair>>& getMap();
+    std::unordered_map<std::string, std::vector<Pair>>& getMap();
     std::vector<std::string>& getClosedJunctions();
     std::string getLocation();
     std::vector<Pair> getNeighbours();
@@ -52,7 +53,7 @@ public:
     bool areReachable(const std::string&);
     std::vector<std::pair<std::string,std::string>> deadEnds();
     std::vector<std::string> shortestPathsFromSource(const std::string&, const std::string&);
-    std::map<int, std::vector<std::string>>  kShortestPaths(const std::string&, const std::string&, int k);
+    std::map<int, std::vector<std::string>>  kShortestPaths(const std::string&, const std::string&, int k); //returns map because it needs to be ordered
     std::vector<std::string> generateEurelianCircuit();
 };
 

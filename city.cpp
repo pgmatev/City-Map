@@ -135,7 +135,7 @@ bool City::isBridge(const std::string& u, const std::string& v)
 City::City()
 {}
 
-std::map<std::string, std::vector<Pair>>& City::getMap()
+std::unordered_map<std::string, std::vector<Pair>>& City::getMap()
 {
     return this->city_map;
 }
@@ -429,8 +429,8 @@ std::vector<std::string> City::shortestPathsFromSource(const std::string& source
     }
     std::priority_queue<std::pair<int, std::string>, std::vector<std::pair<int, std::string>>, std::greater<std::pair<int, std::string>>> pq;
     //priority queue can be used to implement heap, in this case min heap because of the functor argument greater
-    std::map<std::string, int> dist; //distances to all other junctions from the source
-    std::map<std::string, std::vector<std::string>> paths; //paths to all other junctions from the source
+    std::unordered_map<std::string, int> dist; //distances to all other junctions from the source
+    std::unordered_map<std::string, std::vector<std::string>> paths; //paths to all other junctions from the source
 
     for (auto it : city_map)
     {
@@ -494,7 +494,7 @@ std::map<int, std::vector<std::string>> City::kShortestPaths(const std::string& 
                         std::greater<std::tuple<int, std::string, std::vector<std::string>>>> pq;   
     //implementation of min heap, sorting the paths helps us to pop the shortest current path first, 
     //therefore the first 3 pops will be the 3 shortests paths
-    std::map<std::string, int> visited_count; //count the amount of times we visited a junction
+    std::unordered_map<std::string, int> visited_count; //count the amount of times we visited a junction
     std::map<int, std::vector<std::string>> results;
 
     for (auto it : city_map)

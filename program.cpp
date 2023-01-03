@@ -16,11 +16,15 @@ void Program::run(int argc, char* argv[])
         std::string dotty = "graph.dot";
         takeInput(argv[2], dotty, argv[3]); //load the map 
         std::cout << "Interactive mode initialised, type \"exit\" to quit" << std::endl;
-        std::string input;
-        while (input != "exit")
+        while (true)
         {
-            std::cout << ">";
+            std::cout << "> ";
+            std::string input;
             std::getline(std::cin, input);
+            if (input == "exit")
+            {
+                break;
+            }
             //==/ no argument commands /==
             if (input == "location")
             {
@@ -133,6 +137,7 @@ void Program::run(int argc, char* argv[])
                     threeShortestPaths(commands[1], commands[2]);
                     continue;
                 }
+                throw std::invalid_argument("Unknown command");
             }
             catch (std::invalid_argument& e)
             {
