@@ -159,6 +159,11 @@ void City::setLocation(const std::string& new_location)
 {
     if (city_map.find(new_location) == city_map.end())
     {
+        if (location == "") //if its the first initialisation, return a default location
+        {
+           this->location = city_map.begin()->first;
+           throw std::invalid_argument("Location does not exist, default generation!");
+        }
         throw std::invalid_argument("Location does not exist!");
     }
     this->location = new_location;
@@ -476,7 +481,7 @@ std::vector<std::string> City::shortestPathsFromSource(const std::string& source
     return result;
 }
 
-//FUTURE TO DO: Make loopless (Yen's algorithm), Optimise by removing junctions with no path to destination
+//FUTURE TO DO: Optimise by removing junctions with no path to destination
 std::map<int, std::vector<std::string>> City::kShortestPaths(const std::string& source, const std::string& destination, int k)
 //Eppstein's algorithm, based on Dijkstra's algorithm
 {
@@ -495,6 +500,7 @@ std::map<int, std::vector<std::string>> City::kShortestPaths(const std::string& 
     //implementation of min heap, sorting the paths helps us to pop the shortest current path first, 
     //therefore the first 3 pops will be the 3 shortests paths
     std::unordered_map<std::string, int> visited_count; //count the amount of times we visited a junction
+    std::vector<std::pair<std::string, std::string>> visited_roads; //exclude roads already used in a solution to avoid cycles
     std::map<int, std::vector<std::string>> results;
 
     for (auto it : city_map)
@@ -513,25 +519,31 @@ std::map<int, std::vector<std::string>> City::kShortestPaths(const std::string& 
         std::vector<std::string> path = std::get<2>(tp);
         pq.pop();
 
-        if(visited_count.find(junction)->second == k) //only count the first k visits, in order to get the k shortest paths
+        if(visited_count[junction] == k) //only count the first k visits, in order to get the k shortest paths
         {
             continue;
         }
 
-        visited_count.find(junction)->second += 1;
+        visited_count[junction] += 1;
 
         if (junction == destination) //reached destination, insert accumulated path
         {
+            visited_roads.push_back({path[path.size()-1], path[path.size()-2]}); //exclude the last used road (last 2 junctions in the path)
             results.insert({distance, path});
         }
 
-        for (auto adjacent : city_map.find(junction)->second) //queue all adjacent junctions to current be traversed
+        for (auto adjacent : city_map[junction]) //queue all adjacent junctions to current be traversed
         {
             if (!isClosed(adjacent.first)) //if junction is not closed
             {
-                std::vector<std::string> new_path = path;
-                new_path.push_back(adjacent.first);
-                pq.push({distance + adjacent.second, adjacent.first, new_path});
+                std::pair<std::string, std::string> new_road = {junction, adjacent.first};
+                if (std::find(visited_roads.begin(), visited_roads.end(), new_road) == visited_roads.end())
+                {
+                    std::vector<std::string> new_path = path;
+                    new_path.push_back(adjacent.first);
+                    pq.push({distance + adjacent.second, adjacent.first, new_path});
+                }
+
             }
 
         }
