@@ -18,6 +18,8 @@ class Program
     bool isNumber(char);
     bool isNewLine(char);
 
+    bool validateFile(const std::string&);
+
     void toDottyHelper(std::ostream&);
 
     public:

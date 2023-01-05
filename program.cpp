@@ -2,6 +2,7 @@
 
 void Program::run(int argc, char* argv[])
 {
+
     if (argc == 1) //not starting in interactive mode
     {
         return;
@@ -10,7 +11,7 @@ void Program::run(int argc, char* argv[])
     {
         throw std::invalid_argument("Wrong number of arguments!");
     }
-
+    //what if invalid file, invalid junction
     if (strcmp(argv[1], "-i") == 0)
     {
         std::string dotty = "graph.dot";
@@ -147,6 +148,12 @@ void Program::run(int argc, char* argv[])
     }
 }
 
+bool Program::validateFile(const std::string& filename)
+{
+    std::string extension = filename.substr(filename.length() - 4); // get last 4 symbols of the name
+    return extension == ".txt";
+}
+
 bool Program::isNewLine(char c)
 {
     return c == '\r' || // also a new line symbol
@@ -156,6 +163,10 @@ bool Program::isNewLine(char c)
 void Program::takeInput(const std::string& filename, const std::string& dot_filename, const std::string& starting_location)
 {
     std::ifstream in(filename);
+    if (!validateFile(filename))
+    {
+        throw std::invalid_argument("Not a .txt file");
+    }
     bool isKey = true;
     std::string loaded_key;
     std::string s;
