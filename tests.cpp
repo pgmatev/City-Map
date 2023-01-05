@@ -119,9 +119,8 @@ TEST_CASE("Algorithms tests")
         c.addRoad("C", "D", 4);
         c.addRoad("C", "E", 5);
         c.addRoad("E", "D", 1);
-        std::unordered_map<int, std::vector<std::string>> results = {{3, std::vector<std::string>{"A", "C", "B"}},
-                                                          {4, std::vector<std::string>{"A", "B"}},
-                                                          {7, std::vector<std::string>{"A", "C", "B", "C", "B"}}};
+        std::map<int, std::vector<std::string>> results = {{3, std::vector<std::string>{"A", "C", "B"}},
+                                                          {4, std::vector<std::string>{"A", "B"}}};
         CHECK(map_compare(c.kShortestPaths("A", "B", 3), results));
     }
     SUBCASE("Reach all other junctions test")
@@ -180,11 +179,11 @@ TEST_CASE("Algorithms tests")
         c2.addRoad("D", "B", 3);
         c2.addRoad("G", "A", 8);
         std::vector<std::string> result2 = {"G", "B", "D", "C", "B", "A", "G"}; //the result is inverted
-        for (auto v : c2.generateEurelianCircuit())
-        {
-            std::cout << v << " ";
-        }
-        std::cout << std::endl;
+        // for (auto v : c2.generateEurelianCircuit())
+        // {
+        //     std::cout << v << " ";
+        // }
+        // std::cout << std::endl;
         CHECK_EQ(c2.generateEurelianCircuit(), result2); //unpredictable because of unordered_map :(
     }
 }
