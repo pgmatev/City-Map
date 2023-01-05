@@ -175,7 +175,7 @@ void Program::takeInput(const std::string& filename, const std::string& dot_file
     {
         bool isKey = true; // first value of a row is a key junction
         std::stringstream ss(s); //convert to stringstream so getline is usable
-        while (getline(ss, s, ' '))
+        while (ss >> s)
         {
             if (isKey) //key value for the map
             {
@@ -195,14 +195,15 @@ void Program::takeInput(const std::string& filename, const std::string& dot_file
                 if(!isNewLine(ss.peek())) //if the symbol after the value is a new line                           
                 {                        //there is no next value
                     std::string s1;     //pairing the values so to get the junction and its distance
-                    getline(ss, s1, ' ');
+                    ss >> s1;
                     try
                     {
                         int distance = stoi(s1); //distance should be a number
                         loaded_city.addRoad(loaded_key, s, distance);
                     }catch(std::invalid_argument& e)
                     {
-                        std::cout << "Error: " << e.what() << std::endl;
+                        std::cerr << "Error when reading the file: Junctions should be in pairs with a road length!" << std::endl;
+                        throw;
                     }
 
                 }
@@ -301,7 +302,7 @@ void Program::toDottyHelper(std::ostream& out)
         for (auto v : j1->second)
         {
             auto j2 = loaded_city.getMap().find(v.first);
-            out << (long)&j1->first << "->" << (long)&j2->first << "[label = \""<< v.second << "\" color = \"blue\"]\n";
+            out << (long)&j1->first << "->" << (long)&j2->first << "[label = \""<< v.second << "\"]\n";
         }
     }
 }
